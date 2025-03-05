@@ -1,9 +1,12 @@
 import cv2
 import numpy as np
+import pytesseract
+
+# Paths to source and target images
+src_path = 'srcs/buttonsrc.jpg'
+target_path = 'targets/button.jpg'
 
 # Read source and target images
-src_path = 'srcs/src.jpg'
-target_path = 'targets/target-strenched.jpg'
 img_src = cv2.imread(src_path, cv2.IMREAD_GRAYSCALE)  # Source image in grayscale
 img_target_color = cv2.imread(target_path)  # Target image in color
 
@@ -47,11 +50,32 @@ if len(good) > 10:
     pts = np.float32([[0, 0], [0, h - 1], [w - 1, h - 1], [w - 1, 0]]).reshape(-1, 1, 2)
     dst = cv2.perspectiveTransform(pts, M)
 
-    # Output the coordinates of the matching region
-    top_left = tuple(dst[0][0])
-    bottom_right = tuple(dst[2][0])
+    # Extract the bounding box coordinates of the matched region
+    x_coords = [np.int32(dst[i][0][0]) for i in range(4)]
+    y_coords = [np.int32(dst[i][0][1]) for i in range(4)]
+    top_left = (min(x_coords), min(y_coords))
+    bottom_right = (max(x_coords), max(y_coords))
+
     print(f"Top-left corner of the matching region: {top_left}")
     print(f"Bottom-right corner of the matching region: {bottom_right}")
+
+    # Function to preprocess and extract text from a button region
+    def extract_text_from_region(image, pts):
+        mask = np.zeros_like(image[:, :, 0])  # Create a mask
+        cv2.fillPoly(mask, [np.int32(pts)], 255)  # Fill the button region
+        masked_image = cv2.bitwise_and(image, image, mask=mask)  # Apply mask
+        
+        # Preprocess the masked image for better OCR accuracy
+        gray = cv2.cvtColor(masked_image, cv2.COLOR_BGR2GRAY)
+        _, binary = cv2.threshold(gray, 0, 255, cv2.THRESH_BINARY + cv2.THRESH_OTSU)
+        
+        # Use Tesseract to extract text
+        text = pytesseract.image_to_string(binary, config='--psm 6')
+        return text.strip()
+
+    # Extract text from the button region
+    button_text = extract_text_from_region(img_target_color, dst)
+    print(f"Extracted text from button: {button_text}")
 
     # Draw the matching region on the original color image
     img_target_with_box = img_target_color.copy()
@@ -61,3 +85,4 @@ if len(good) > 10:
     cv2.imwrite('outputs/output.jpg', img_target_with_box)
 else:
     print("Not enough good matches to determine the matching region.")
+    

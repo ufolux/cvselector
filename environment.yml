@@ -32,6 +32,7 @@ dependencies:
   - jpeg=9e=h998d150_3
   - krb5=1.20.1=h2e2fba8_1
   - lame=3.100=hfd63f10_0
+  - lcms2=2.16=hd2bd712_0
   - ld_impl_linux-aarch64=2.40=h48e3ba3_0
   - leptonica=1.82.0=h5aee8ef_2
   - lerc=4.0.0=h419075a_0
@@ -82,9 +83,12 @@ dependencies:
   - openjpeg=2.5.2=ha2c532c_0
   - openldap=2.6.4=h418a7c9_0
   - openssl=3.0.15=h998d150_0
+  - packaging=24.2=py313hd43f75c_0
   - pcre2=10.42=hcfaa891_1
+  - pillow=11.1.0=py313ha07ccc2_0
   - pip=25.0=py313hd43f75c_0
   - pixman=0.40.0=h2f4d8fa_1
+  - pytesseract=0.3.10=py313hd43f75c_1
   - python=3.13.2=hc5ec5e8_100_cp313
   - python_abi=3.13=0_cp313
   - qt-main=5.15.2=h1e70531_12
